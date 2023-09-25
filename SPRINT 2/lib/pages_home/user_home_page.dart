@@ -1,4 +1,4 @@
-import 'package:BskCenter/registro/login/registrar_page.dart';
+import 'package:BskCenter/registro/login/login_page.dart';
 import 'package:flutter/material.dart';
 import '../menu/menu_page.dart';
 
@@ -52,7 +52,7 @@ class UserHomePage extends StatelessWidget {
                   onPressed: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => RegistrarPage(),
+                        builder: (context) => LoginPage(),
                       ),
                     );
                   },
@@ -61,7 +61,7 @@ class UserHomePage extends StatelessWidget {
                     backgroundColor: const Color.fromARGB(203, 0, 0, 0),
                   ),
                   child: const Text(
-                    'Registrar',
+                    'Login',
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.white,
