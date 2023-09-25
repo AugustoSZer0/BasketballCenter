@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:BskCenter/models/player.dart';
+import '../compare_page/players_compare_page.dart';
 import '../menu/menu_page.dart';
 import 'package:http/http.dart' as http;
 
@@ -213,7 +214,15 @@ class _PlayersHomePageState extends State<PlayersHomePage> {
       floatingActionButton: FloatingActionButton(
         backgroundColor:
             selectedPlayers.length == 2 ? Colors.green : Colors.blue,
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  PlayersComparePage(selectedPlayers: selectedPlayers),
+            ),
+          );
+        },
         child: selectedPlayers.length == 2
             ? const Icon(Icons.check)
             : Text('${selectedPlayers.length}'),
