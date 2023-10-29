@@ -6,6 +6,7 @@ import '../menu/menu_page.dart';
 import 'package:http/http.dart' as http;
 import '../models/playerWithStats.dart';
 import '../biblioteca/players_info.dart';
+import '../pages_detail/user_detail_page.dart';
 
 class PlayersComparePage extends StatelessWidget {
   List<int> selectedPlayers;
@@ -78,7 +79,11 @@ class PlayersComparePage extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.account_circle_rounded),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => UserDetailPage(),
+              ));
+            },
           ),
         ],
       ),

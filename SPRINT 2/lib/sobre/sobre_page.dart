@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../menu/menu_page.dart';
+import '../pages_detail/user_detail_page.dart';
 
 class SobrePage extends StatelessWidget {
   @override
@@ -9,11 +10,15 @@ class SobrePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Basketball Center'),
         centerTitle: true,
-        backgroundColor: Colors.black, // Cor da barra de navegação
+        backgroundColor: const Color.fromARGB(203, 0, 0, 0),
         actions: [
           IconButton(
             icon: const Icon(Icons.account_circle_rounded),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => UserDetailPage(),
+              ));
+            },
           ),
         ],
       ),

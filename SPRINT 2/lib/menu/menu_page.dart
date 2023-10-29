@@ -11,7 +11,6 @@ class MenuPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: ListView(
-        // Important: Remove any padding from the ListView.
         padding: EdgeInsets.zero,
         children: [
           const DrawerHeader(
@@ -39,7 +38,7 @@ class MenuPage extends StatelessWidget {
               title: const Text(
                 'Home',
                 style: TextStyle(
-                  fontSize: 20, // Defina o tamanho da fonte, se desejar.
+                  fontSize: 20,
                 ),
               ),
               onTap: () {
@@ -59,7 +58,7 @@ class MenuPage extends StatelessWidget {
               title: const Text(
                 'Todos os Times',
                 style: TextStyle(
-                  fontSize: 20, // Defina o tamanho da fonte, se desejar.
+                  fontSize: 20,
                 ),
               ),
               onTap: () {

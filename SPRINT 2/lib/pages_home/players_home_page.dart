@@ -4,12 +4,8 @@ import 'package:BskCenter/models/player.dart';
 import '../compare_page/players_compare_page.dart';
 import '../menu/menu_page.dart';
 import 'package:http/http.dart' as http;
-
-import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import '../models/player.dart';
 import '../biblioteca/players_info.dart';
+import '../pages_detail/user_detail_page.dart';
 
 class PlayersHomePage extends StatefulWidget {
   const PlayersHomePage({Key? key}) : super(key: key);
@@ -117,7 +113,11 @@ class _PlayersHomePageState extends State<PlayersHomePage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.account_circle_rounded),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => UserDetailPage(),
+              ));
+            },
           ),
         ],
       ),
@@ -187,8 +187,7 @@ class _PlayersHomePageState extends State<PlayersHomePage> {
                       child: Container(
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? Color.fromARGB(91, 68, 137,
-                                  255) // Cor de fundo para jogadores selecionados
+                              ? const Color.fromARGB(91, 68, 137, 255)
                               : Colors.grey[200],
                           borderRadius: BorderRadius.circular(8),
                         ),

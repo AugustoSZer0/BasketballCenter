@@ -5,6 +5,7 @@ import '../menu/menu_page.dart';
 import 'package:http/http.dart' as http;
 import '../models/team.dart';
 import '../biblioteca/teams_info.dart';
+import '../pages_detail/user_detail_page.dart';
 
 // ignore: must_be_immutable
 class TeamsHomePage extends StatefulWidget {
@@ -22,10 +23,8 @@ class _TeamsHomePageState extends State<TeamsHomePage> {
     super.initState();
   }
 
-  // get teams
   Future<void> getTeams() async {
     try {
-      // Primeiro, tenta fazer a solicitação para balldontlie.io
       final ballDonLieUrl = Uri.parse('https://balldontlie.io/api/v1/teams');
       final ballDonLieResponse = await http.get(ballDonLieUrl);
 
@@ -67,7 +66,11 @@ class _TeamsHomePageState extends State<TeamsHomePage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.account_circle_rounded),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => UserDetailPage(),
+              ));
+            },
           ),
         ],
       ),

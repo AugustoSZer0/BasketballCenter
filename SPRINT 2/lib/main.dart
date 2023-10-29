@@ -1,7 +1,13 @@
+import 'dart:io';
+import 'package:BskCenter/pages_home/user_home_page.dart';
 import 'package:flutter/material.dart';
-import 'pages_home/teams_home_page.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() {
+  if (Platform.isWindows) {
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+  }
   runApp(const MyApp());
 }
 
@@ -12,7 +18,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: TeamsHomePage(),
+      home: UserHomePage(),
     );
   }
 }

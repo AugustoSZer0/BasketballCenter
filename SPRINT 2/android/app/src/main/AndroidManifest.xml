@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.httpapp">
    <application
-        android:label="httpapp"
+        android:label="BskCenter"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
