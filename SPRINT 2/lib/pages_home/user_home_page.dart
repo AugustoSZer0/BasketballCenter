@@ -1,10 +1,12 @@
 import 'package:BskCenter/pages_detail/user_detail_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:BskCenter/registro/login/login_page.dart';
 import 'package:BskCenter/biblioteca/teams_info.dart';
 import '../menu/menu_page.dart';
+import '../servicos/autenticacao_servico.dart';
 
 final Map<int, Color> teamColors = {
   1: Colors.red, // Atlanta Hawks
@@ -45,32 +47,33 @@ class UserHomePage extends StatefulWidget {
 }
 
 class _UserHomePageState extends State<UserHomePage> {
+  AutenticacaoServico _autenServico = AutenticacaoServico();
+  FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
+
   Future<Map<String, dynamic>?> getLoggedInUserTeam() async {
-    final bd = await _recuperarBancoDados();
-    final result = await bd.query("usuarios", where: "logado = 1");
-    if (result.isNotEmpty) {
-      final loggedUser = result[0];
-      final userTeamName = loggedUser["time"];
-      // Agora, encontre as informações do time com base no nome do time
-      final teamInfo = manualTeamsData.firstWhere(
-        (team) => team["full_name"] == userTeamName,
-        orElse: () => {},
-      );
-      return teamInfo;
+    User? usuario = await _autenServico.recuperaUsuarioLogado();
+
+    if (usuario != null) {
+      try {
+        DocumentSnapshot<Map<String, dynamic>> userSnapshot = await _firebaseFirestore.collection('time').doc(usuario.uid).get();
+
+        if (userSnapshot.exists) {
+          final userTeamName = userSnapshot.data()?['nomeTime'];
+
+          if (userTeamName != null) {
+            final teamInfo = manualTeamsData.firstWhere(
+              (team) => team["full_name"] == userTeamName,
+              orElse: () => Map<String, dynamic>(),  // Retorna um mapa vazio se não encontrar
+            );
+
+            return teamInfo;
+          }
+        }
+      } catch (e) {
+        return null;
+      }
     }
     return null;
-  }
-
-  _recuperarBancoDados() async {
-    final caminhoBancoDados = await getDatabasesPath();
-    final localBancoDados = join(caminhoBancoDados, "banco8.bd");
-    var bd = await openDatabase(localBancoDados, version: 1,
-        onCreate: (db, dbVersaoRecente) {
-      String sql =
-          "CREATE TABLE usuarios (id INTEGER PRIMARY KEY AUTOINCREMENT, username VARCHAR, email VARCHAR, senha VARCHAR, logado INTEGER, time VARCHAR)";
-      db.execute(sql);
-    });
-    return bd;
   }
 
   @override

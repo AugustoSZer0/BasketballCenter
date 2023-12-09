@@ -1,8 +1,7 @@
+import 'package:BskCenter/servicos/autenticacao_servico.dart';
 import 'package:flutter/material.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:path/path.dart';
 
 import '../../biblioteca/teams_info.dart';
 
@@ -12,63 +11,18 @@ class RegistrarPage extends StatefulWidget {
 }
 
 class _RegistrarPageState extends State<RegistrarPage> {
+  AutenticacaoServico _autenServico = AutenticacaoServico();
+
   String? _selectedItem;
   List<String> _items = [];
-  final usernameController = TextEditingController();
-  final emailController = TextEditingController();
-  final senhaController = TextEditingController();
-  final logado = 0;
+  TextEditingController emailController = TextEditingController();
+  TextEditingController senhaController = TextEditingController();
+  TextEditingController usernameController = TextEditingController();
 
-  _recuperarBancoDados() async {
-    final caminhoBancoDados = await getDatabasesPath();
-    final localBancoDados = join(caminhoBancoDados, "banco8.bd");
-    var bd = await openDatabase(localBancoDados, version: 1,
-        onCreate: (db, dbVersaoRecente) {
-      String sql =
-          "CREATE TABLE usuarios (id INTEGER PRIMARY KEY AUTOINCREMENT, username VARCHAR, email VARCHAR, senha VARCHAR, logado INTEGER, time VARCHAR)";
-      db.execute(sql);
-    });
-    return bd;
-  }
-
-  _salvarDados(String username, String senha, String email, String time) async {
+  _salvarDados(String username, String senha, String email, String time){
     BuildContext context = this.context;
-    Database bd = await _recuperarBancoDados();
-    Map<String, dynamic> dadosUsuario = {
-      "username": username,
-      "email": email,
-      "senha": senha,
-      "logado": logado,
-      "time": time,
-    };
-
-    int id = await bd.insert("usuarios", dadosUsuario);
-    if (id > 0) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("Usuário registrado com sucesso."),
-        backgroundColor: Colors.green,
-      ));
-      _listarUsuarios();
-      Navigator.pop(context);
-    }
-  }
-
-  _listarUsuarios() async {
-    Database bd = await _recuperarBancoDados();
-    String sql = "SELECT * FROM usuarios";
-    List usuarios = await bd.rawQuery(sql);
-    for (var usu in usuarios) {
-      print(" id: " +
-          usu['id'].toString() +
-          " username: " +
-          usu['username'] +
-          " email: " +
-          usu['email'] +
-          " senha: " +
-          usu['senha'] +
-          " time: " +
-          usu['time'].toString());
-    }
+    _autenServico.cadastraUsuario(username: username, email: email, senha: senha, time: time);
+    Navigator.pop(context);
   }
 
   _carregarTimes() async {

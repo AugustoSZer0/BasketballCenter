@@ -1,9 +1,13 @@
 import 'dart:convert';
 
+import 'package:BskCenter/servicos/autenticacao_servico.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:sqflite/sqflite.dart';
+// import 'package:sqflite/sqflite.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
+
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../biblioteca/teams_info.dart';
 
@@ -16,6 +20,10 @@ class _UserDetailPageState extends State<UserDetailPage> {
   TextEditingController usernameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController senhaController = TextEditingController();
+
+  FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
+  AutenticacaoServico _autenServico = AutenticacaoServico();
+
 
   String? _selectedItem;
   List<String> _items = [];
@@ -58,38 +66,54 @@ class _UserDetailPageState extends State<UserDetailPage> {
   }
 
   _carregarDadosUsuario() async {
-    final bd = await _recuperarBancoDados();
-    final result =
-        await bd.query("usuarios", where: "logado = ?", whereArgs: [1]);
-    if (result.isNotEmpty) {
-      final user = result.first;
+    User? usuario = await _autenServico.recuperaUsuarioLogado();
+    
+    if (usuario != null) {
+      DocumentSnapshot<Map<String, dynamic>> userSnapshot = await _firebaseFirestore.collection('time').doc(usuario.uid).get();
+      
       setState(() {
-        usernameController.text = user["username"];
-        emailController.text = user["email"];
-        senhaController.text = user["senha"];
-        _selectedItem = user["time"];
+        usernameController.text = '${usuario.displayName}';
+        emailController.text = '${usuario.email}';
+        _selectedItem = userSnapshot.data()?['nomeTime'];
       });
     }
   }
 
   _atualizarUsuario() async {
-    final bd = await _recuperarBancoDados();
-    final updatedUser = {
-      "username": usernameController.text,
-      "email": emailController.text,
-      "senha": senhaController.text,
-      "time": _selectedItem,
-    };
-    await bd
-        .update("usuarios", updatedUser, where: "logado = ?", whereArgs: [1]);
-    _mostrarSnackBar("Alterações salvas com sucesso!");
+    try {
+      User? usuario = await _autenServico.recuperaUsuarioLogado();
+
+      if (usuario != null) {
+        DocumentReference<Map<String, dynamic>> usuarioRef = FirebaseFirestore.instance.collection('time').doc(usuario.uid);
+        DocumentSnapshot<Map<String, dynamic>> usuarioSnapshot = await usuarioRef.get();
+        Map<String, dynamic>? dadosAtuais = usuarioSnapshot.data();
+        
+        await usuario.verifyBeforeUpdateEmail(emailController.text);
+        if(senhaController.text != null){
+          await usuario.updatePassword(senhaController.text);
+        }
+        await usuario.updateDisplayName(usernameController.text);
+
+        if (dadosAtuais != null) {
+          dadosAtuais['nomeTime'] = _selectedItem; 
+          await usuarioRef.update(dadosAtuais);
+        }
+
+        await usuario.reload();
+        usuario = FirebaseAuth.instance.currentUser;
+
+        _mostrarSnackBar("Alterações salvas com sucesso!");
+      } else {
+        print('Nenhum usuário logado.');
+      }
+    } catch (e) {
+      print('Erro ao atualizar perfil do usuário: $e');
+    }
   }
 
   _sairDaConta() async {
     BuildContext context = this.context;
-    final bd = await _recuperarBancoDados();
-    await bd.update("usuarios", {"logado": 0},
-        where: "logado = ?", whereArgs: [1]);
+    await FirebaseAuth.instance.signOut();
     _mostrarSnackBar("Conta desconectada!");
     Navigator.of(context).pop({
       'time': _selectedItem,
@@ -98,24 +122,16 @@ class _UserDetailPageState extends State<UserDetailPage> {
 
   _excluirConta() async {
     BuildContext context = this.context;
-    final bd = await _recuperarBancoDados();
-    await bd.delete("usuarios", where: "logado = ?", whereArgs: [1]);
-    _mostrarSnackBar("Conta excluída!");
-    Navigator.of(context).pop({
-      'time': _selectedItem,
-    });
-  }
+    User? usuario = await _autenServico.recuperaUsuarioLogado();
 
-  _recuperarBancoDados() async {
-    final caminhoBancoDados = await getDatabasesPath();
-    final localBancoDados = join(caminhoBancoDados, "banco8.bd");
-    var bd = await openDatabase(localBancoDados, version: 1,
-        onCreate: (db, dbVersaoRecente) {
-      String sql =
-          "CREATE TABLE usuarios (id INTEGER PRIMARY KEY AUTOINCREMENT, username VARCHAR, email VARCHAR, senha VARCHAR, logado INTEGER, time VARCHAR)";
-      db.execute(sql);
-    });
-    return bd;
+    if (usuario != null) {
+      await FirebaseFirestore.instance.collection('time').doc(usuario.uid).delete();
+      await usuario.delete();
+      _mostrarSnackBar("Conta excluida com sucesso!");
+      Navigator.of(context).pop({
+        'time': _selectedItem,
+      });
+    }
   }
 
   _mostrarSnackBar(String mensagem) {
