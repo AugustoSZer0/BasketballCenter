@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "951458051740",
+    "project_id": "basketballcenter-6b5dc",
+    "storage_bucket": "basketballcenter-6b5dc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:951458051740:android:fa6134607d6bc4b7715f59",
+        "android_client_info": {
+          "package_name": "com.example.httpapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA57n6ebBBLl6oTSO3VdOnXnXxUFqE1PqE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
